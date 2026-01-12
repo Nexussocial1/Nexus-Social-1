@@ -1,20 +1,20 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nexus Social 🔥
 
-# Run and deploy your AI Studio app
+Nexus Social is a Firebase-powered futuristic social web app built with pure HTML, CSS and JavaScript.
 
-This contains everything you need to run your app locally.
+Live Preview:  
+👉 https://nex68.netlify.app/
 
-View your app in AI Studio: https://ai.studio/apps/drive/1CnKpzRmZokBdRmqUQezF7eP-NF2tOToW
+---
 
-## Run Locally
+## Features
 
-**Prerequisites:**  Node.js
+- Firebase Email & Password Authentication
+- User Profile page
+- Group creation system (Firestore)
+- Glassmorphism futuristic UI
+- Hosted on Netlify
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Project Structure
