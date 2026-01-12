@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import PostCard from '../components/PostCard';
 import StoryBar from '../components/StoryBar';
@@ -9,6 +8,7 @@ import { useFollow } from '../hooks/useFollow';
 import { 
   db, 
   storage, 
+  auth,
   serverTimestamp 
 } from '../firebaseConfig';
 import { 
@@ -16,8 +16,7 @@ import {
   addDoc, 
   query, 
   orderBy, 
-  onSnapshot,
-  Timestamp 
+  onSnapshot 
 } from 'firebase/firestore';
 import { 
   ref, 
@@ -35,7 +34,7 @@ const HomePage: React.FC<HomePageProps> = ({ currentUser }) => {
   const [pulseSummary, setPulseSummary] = useState<string | null>(null);
   const [permissionError, setPermissionError] = useState(false);
   
-  const { isReported, isIgnored, isMuted, isBlocked, reportPost } = useReport(currentUser.id);
+  const { isReported, isMuted, isBlocked, reportPost } = useReport(currentUser.id);
   const { followingIds } = useFollow(currentUser.id);
   
   const [isComposerRendered, setIsComposerRendered] = useState(false);
@@ -48,23 +47,36 @@ const HomePage: React.FC<HomePageProps> = ({ currentUser }) => {
   const [isPosting, setIsPosting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Real-time Feed Listener with Error Handling
+  // Real-time Feed Listener with robust Auth Check
   useEffect(() => {
+    // Safety check: Don't initialize listener if Firebase auth isn't ready
+    if (!auth.currentUser) return;
+
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
     
     const unsubscribe = onSnapshot(q, {
       next: (snapshot) => {
         setPermissionError(false);
-        const fetchedPosts = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as any[];
+        const fetchedPosts = snapshot.docs.map(doc => {
+          const data = doc.data();
+          const cleanedData = JSON.parse(JSON.stringify(data, (key, value) => {
+            if (value && typeof value === 'object' && typeof value.toDate === 'function') {
+              return value.toDate().toISOString();
+            }
+            return value;
+          }));
+
+          return {
+            id: doc.id,
+            ...cleanedData
+          };
+        }) as any[];
 
         const scoredPosts = fetchedPosts
           .filter(p => !isReported(p.id) && !isMuted(p.userId) && !isBlocked(p.userId))
           .map(p => {
-            const createdAt = p.createdAt?.toDate?.() || new Date();
-            const recencyHours = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60);
+            const createdAtDate = p.createdAt ? new Date(p.createdAt) : new Date();
+            const recencyHours = (Date.now() - createdAtDate.getTime()) / (1000 * 60 * 60);
             const recencyWeight = Math.max(0, 1000 - (recencyHours * 10));
             const followingBonus = followingIds.includes(p.userId) ? 500 : 0;
             const likeScore = (p.likesCount || 0) * 50;
@@ -162,7 +174,7 @@ const HomePage: React.FC<HomePageProps> = ({ currentUser }) => {
       {permissionError && (
         <div className="p-8 glass-aura rounded-3xl border border-rose-500/30 text-rose-400 text-center animate-in fade-in">
           <p className="text-[10px] font-black uppercase tracking-widest">Neural Link Permission Denied</p>
-          <p className="text-xs font-light mt-2">Firestore Security Rules are preventing synchronization. Please ensure Auth is active.</p>
+          <p className="text-xs font-light mt-2">Synchronization blocked. Ensure rules allow node access.</p>
         </div>
       )}
 
