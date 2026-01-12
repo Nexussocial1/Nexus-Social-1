@@ -1,28 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset='UTF-8'>
-<title>Nexus Lite</title>
+<meta charset="UTF-8">
+<title>Nexus Social</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{font-family:sans-serif;background:#02040a;color:#fff}
-#feed .post{background:#111;padding:10px;margin:10px 0;border-radius:8px}
+body{margin:0;font-family:Segoe UI,sans-serif;background:radial-gradient(circle at top,#0f172a,#020617);color:#fff}
+header{text-align:center;padding:18px;font-size:24px;font-weight:600;background:rgba(255,255,255,.06);backdrop-filter:blur(14px);}
+.card{margin:14px;padding:14px;border-radius:18px;background:rgba(255,255,255,.07);backdrop-filter:blur(18px);}
+textarea,input{width:100%;background:transparent;border:none;color:#fff;font-size:16px;outline:none;}
+button{background:#38bdf8;border:none;border-radius:12px;padding:8px 14px;color:white;margin-top:8px;}
+.post{margin:15px;padding:15px;border-radius:18px;background:rgba(255,255,255,.05);}
+.actions button{margin-right:6px;font-size:13px;}
 </style>
 </head>
+
 <body>
-<h2>Nexus Lite Feed</h2>
-<input id="postInput" placeholder="What's on your mind?" />
-<button id="postBtn">Post</button>
+<header>Nexus Social</header>
+
+<div class="card">
+<input id="nameInput" placeholder="Your name"><br><br>
+<textarea id="postInput" rows="3" placeholder="What's happening?"></textarea>
+<button onclick="addPost()">Post</button>
+</div>
+
 <div id="feed"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-document.getElementById('postBtn').onclick=function(){
- const input=document.getElementById('postInput');
- if(!input.value) return;
- const d=document.createElement('div');
- d.className='post';
- d.textContent=input.value;
- document.getElementById('feed').prepend(d);
- input.value='';
+firebase.initializeApp({
+ apiKey: "AIzaSyD8pCEwiDHWvb4vju9vtsXvxFvB29SM6VM",
+ authDomain: "nexus-social-dce76.firebaseapp.com",
+ projectId: "nexus-social-dce76",
+ storageBucket: "nexus-social-dce76.appspot.com",
+ messagingSenderId: "172694934932",
+ appId: "1:172694934932:web:62bb46749dd0c062bfab81"
+});
+
+const db = firebase.firestore();
+
+// Save a new post
+function addPost(){
+  const name = document.getElementById("nameInput").value.trim() || "Anonymous";
+  const text = document.getElementById("postInput").value.trim();
+
+  if(text === "") return;
+
+  db.collection("posts").add({
+    user: name,
+    text: text,
+    likes: 0,
+    time: Date.now()
+  });
+  document.getElementById("postInput").value = "";
+}
+
+// Real-time listener
+db.collection("posts")
+  .orderBy("time", "desc")
+  .onSnapshot(snapshot => {
+    document.getElementById("feed").innerHTML = "";
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      document.getElementById("feed").innerHTML += `
+        <div class="post">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <img src="https://i.pravatar.cc/40?u=${p.user}" style="width:40px;height:40px;border-radius:50%;border:2px solid #38bdf8">
+            <div>
+              <b>${p.user}</b><br>
+              <span style="font-size:12px;color:#9ca3af">Online</span>
+            </div>
+          </div>
+          <p style="margin-top:8px">${p.text}</p>
+          <div class="actions">
+            ❤️ ${p.likes}
+            <button onclick="likePost('${doc.id}', ${p.likes})">Like</button>
+          </div>
+        </div>`;
+    });
+  });
+
+// Like
+function likePost(id, likes){
+  db.collection("posts").doc(id).update({
+    likes: likes + 1
+  });
 }
 </script>
+
 </body>
 </html>
