@@ -1,1 +1,52 @@
+body {
+  background: radial-gradient(circle at top, #050d1a, #000);
+  font-family: system-ui, sans-serif;
+  color: white;
+  margin: 0;
+}
 
+.glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px;
+}
+
+header {
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.post-box textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  resize: none;
+  height: 60px;
+  font-size: 16px;
+}
+
+.post-box button {
+  background: #1da1f2;
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#feed .post {
+  background: rgba(255,255,255,0.05);
+  padding: 12px;
+  margin: 12px;
+  border-radius: 12px;
+}
+
+#feed .post p {
+  margin: 6px 0 0;
+}
