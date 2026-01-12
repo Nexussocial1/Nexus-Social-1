@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Post, User } from '../types';
 import { SUGGESTED_FRIENDS } from '../constants';

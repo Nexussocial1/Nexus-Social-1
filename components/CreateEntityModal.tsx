@@ -1,6 +1,7 @@
-
 import React, { useState } from 'react';
 import { User, Group, Page } from '../types';
+import { db } from '../firebaseConfig';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 interface CreateEntityModalProps {
   type: 'group' | 'page';
@@ -19,48 +20,46 @@ const CreateEntityModal: React.FC<CreateEntityModalProps> = ({ type, currentUser
 
   if (!isOpen) return null;
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!name.trim()) return;
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       const avatar = `https://api.dicebear.com/7.x/${type === 'group' ? 'shapes' : 'identicon'}/svg?seed=${seed}`;
-      
+      const commonData = {
+        name: name.trim(),
+        description: description.trim(),
+        avatar,
+        ownerId: currentUser.id,
+        createdAt: serverTimestamp(),
+      };
+
       if (type === 'group') {
-        const newGroup: Group = {
-          id: `g-${Date.now()}`,
-          name: name.trim(),
-          description: description.trim(),
-          avatar,
+        const groupData = {
+          ...commonData,
           memberIds: [currentUser.id],
-          ownerId: currentUser.id,
           privacy: extra as 'public' | 'private'
         };
-        const saved = localStorage.getItem('nexus_groups');
-        const groups = saved ? JSON.parse(saved) : [];
-        localStorage.setItem('nexus_groups', JSON.stringify([...groups, newGroup]));
-        onCreated(newGroup);
+        const docRef = await addDoc(collection(db, "groups"), groupData);
+        onCreated({ id: docRef.id, ...groupData });
       } else {
-        const newPage: Page = {
-          id: `pg-${Date.now()}`,
-          name: name.trim(),
-          description: description.trim(),
-          avatar,
+        const pageData = {
+          ...commonData,
           category: extra,
           followerIds: [currentUser.id],
-          ownerId: currentUser.id
         };
-        const saved = localStorage.getItem('nexus_pages');
-        const pages = saved ? JSON.parse(saved) : [];
-        localStorage.setItem('nexus_pages', JSON.stringify([...pages, newPage]));
-        onCreated(newPage);
+        const docRef = await addDoc(collection(db, "pages"), pageData);
+        onCreated({ id: docRef.id, ...pageData });
       }
       
-      setLoading(false);
       onClose();
       setName('');
       setDescription('');
-    }, 1000);
+    } catch (err) {
+      console.error("Entity generation failed:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

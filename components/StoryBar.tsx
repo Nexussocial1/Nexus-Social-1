@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { User, Story } from '../types';
 import { SUGGESTED_FRIENDS, MOCK_STORIES } from '../constants';
