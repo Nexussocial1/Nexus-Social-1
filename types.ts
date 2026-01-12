@@ -1,4 +1,3 @@
-
 export type ReactionType = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
 
 export type NotificationType = 'like' | 'comment' | 'follow' | 'system' | 'mention' | 'invite';
@@ -21,7 +20,7 @@ export interface Group {
   avatar: string;
   coverImage?: string;
   memberIds: string[];
-  restrictedIds?: string[]; // Banned/Restricted users
+  restrictedIds?: string[];
   ownerId: string;
   privacy: 'public' | 'private';
 }
@@ -79,10 +78,10 @@ export interface Post {
   altText?: string;
   timestamp?: any;
   createdAt?: any;
-  likes: number; // For compatibility
-  likesCount?: number; // Real Firestore count
+  likes: number; 
+  likesCount?: number; 
   comments: number;
-  commentsCount?: number; // Real Firestore count
+  commentsCount?: number; 
   shares: number;
   commentsList?: PostComment[];
   isLiked?: boolean;
@@ -109,7 +108,7 @@ export interface Message {
   text: string;
   mediaUrl?: string;
   mediaType?: 'image' | 'video' | 'audio' | 'video-note';
-  timestamp: Date;
+  timestamp: any;
   isEdited?: boolean;
 }
 

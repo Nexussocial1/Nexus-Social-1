@@ -1,149 +1,28 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus | Aura Kinetic</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-deep: #02040a;
-            --aura-primary: #6366f1;
-            --aura-secondary: #06b6d4;
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-        body {
-            font-family: 'Lexend', sans-serif;
-            background-color: var(--bg-deep);
-            color: #f1f5f9;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-        }
-        .font-display { font-family: 'Outfit', sans-serif; }
-        
-        /* Aura Glassmorphism */
-        .glass-aura {
-            background: rgba(15, 23, 42, 0.3);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Refractive Border Effect */
-        .refract-border {
-            position: relative;
-        }
-        .refract-border::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent, rgba(255,255,255,0.05));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 0px;
-        }
-
-        @keyframes aura-pulse {
-            0% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
-            50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.2); }
-            100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
-        }
-        .animate-aura {
-            animation: aura-pulse 8s infinite ease-in-out;
-        }
-
-        @keyframes spectral-scan {
-            0% { transform: translateY(-100%); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(400%); opacity: 0; }
-        }
-        .animate-spectral {
-            animation: spectral-scan 2s infinite ease-in-out;
-        }
-
-        @keyframes image-flash {
-            0% { filter: brightness(1) blur(0px); transform: scale(0.98); }
-            15% { filter: brightness(2) blur(4px); transform: scale(1.02); }
-            100% { filter: brightness(1) blur(0px); transform: scale(1); }
-        }
-        .animate-flash {
-            animation: image-flash 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes composer-exit {
-            0% { opacity: 1; transform: scale(1) translateY(0); }
-            100% { opacity: 0; transform: scale(0.9) translateY(40px); filter: blur(10px); }
-        }
-        .animate-composer-exit {
-            animation: composer-exit 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(0); opacity: 1; }
-            100% { transform: scale(4); opacity: 0; }
-        }
-        .animate-ripple {
-            animation: ripple 0.8s ease-out forwards;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        .shimmer-loading {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-        }
-
-        @keyframes image-reveal {
-            0% { opacity: 0; filter: blur(20px) saturate(0); transform: scale(1.1); }
-            100% { opacity: 1; filter: blur(0px) saturate(1); transform: scale(1); }
-        }
-        .animate-reveal {
-            animation: image-reveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .glow-aura-white {
-            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
-        }
-        .glow-aura-blue {
-            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1);
-        }
-    </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.12.0",
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
-    "firebase/storage": "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js",
-    "firebase/": "https://esm.sh/firebase@^12.7.0/"
-  }
-}
-</script>
+<meta charset='UTF-8'>
+<title>Nexus Lite</title>
+<style>
+body{font-family:sans-serif;background:#02040a;color:#fff}
+#feed .post{background:#111;padding:10px;margin:10px 0;border-radius:8px}
+</style>
 </head>
 <body>
-    <div id="root"></div>
+<h2>Nexus Lite Feed</h2>
+<input id="postInput" placeholder="What's on your mind?" />
+<button id="postBtn">Post</button>
+<div id="feed"></div>
+<script>
+document.getElementById('postBtn').onclick=function(){
+ const input=document.getElementById('postInput');
+ if(!input.value) return;
+ const d=document.createElement('div');
+ d.className='post';
+ d.textContent=input.value;
+ document.getElementById('feed').prepend(d);
+ input.value='';
+}
+</script>
 </body>
 </html>

@@ -61,7 +61,8 @@ export const generateAIChatResponse = async (history: { role: 'user' | 'model'; 
         systemInstruction: "You are Nexus AI. Witty, helpful, and concise (max 2 sentences). Use a technical/futuristic tone."
       }
     }), 1);
-    return response.text || "Frequencies aligned.";
+    const text = response.text;
+    return typeof text === 'string' ? text : "Frequencies aligned.";
   } catch (error) {
     return "Local node synchronization optimal. Transmit again in a moment.";
   }
@@ -92,7 +93,7 @@ export const summarizeFeed = async (posts: Post[]) => {
       contents: `Summarize this feed in 3 very short atmospheric bullet points. Data:\n${postData}`,
     }));
     
-    const summary = response.text;
+    const summary = String(response.text || "");
     localStorage.setItem(SUMMARY_CACHE_KEY, JSON.stringify({ 
       data: summary, 
       timestamp: Date.now(), 
@@ -161,7 +162,8 @@ export const getGlobalEchoes = async (): Promise<Post[]> => {
       config: { responseMimeType: "application/json" }
     }));
     
-    const rawData = JSON.parse(response.text || "[]");
+    const text = String(response.text || "[]");
+    const rawData = JSON.parse(text);
     const sanitizedData = rawData.map((p: any) => ({
       ...p,
       id: `global-${p.id}`,
