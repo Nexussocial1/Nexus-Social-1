@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { ALL_MOCK_USERS, CURRENT_USER } from '../constants';
 import { User } from '../types';

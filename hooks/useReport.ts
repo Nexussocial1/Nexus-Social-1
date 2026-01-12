@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Post } from '../types';
 
@@ -73,24 +72,31 @@ export const useReport = (currentUserId: string) => {
   }, [userKey]);
 
   const toggleSavePost = useCallback((post: Post) => {
+    // Sanitize post for storage to avoid circular references from SDK class instances
+    const sanitizedPost = JSON.parse(JSON.stringify(post, (key, value) => {
+      // If we encounter a Firestore Timestamp or similar object with toDate, convert it
+      if (value && typeof value === 'object' && typeof value.toDate === 'function') {
+        return value.toDate().toISOString();
+      }
+      return value;
+    }));
+
     setReportState(prev => {
-      const isCurrentlySaved = prev.savedPostIds.includes(post.id);
+      const isCurrentlySaved = prev.savedPostIds.includes(sanitizedPost.id);
       const nextIds = isCurrentlySaved 
-        ? prev.savedPostIds.filter(id => id !== post.id)
-        : [...prev.savedPostIds, post.id];
+        ? prev.savedPostIds.filter(id => id !== sanitizedPost.id)
+        : [...prev.savedPostIds, sanitizedPost.id];
       
       localStorage.setItem(savedKey, JSON.stringify(nextIds));
 
-      // Handle full content persistence
       const savedContentStr = localStorage.getItem(savedContentKey);
       let savedContent: Post[] = savedContentStr ? JSON.parse(savedContentStr) : [];
       
       if (isCurrentlySaved) {
-        savedContent = savedContent.filter(p => p.id !== post.id);
+        savedContent = savedContent.filter(p => p.id !== sanitizedPost.id);
       } else {
-        // Avoid duplicates in content store
-        if (!savedContent.find(p => p.id === post.id)) {
-          savedContent.push(post);
+        if (!savedContent.find(p => p.id === sanitizedPost.id)) {
+          savedContent.push(sanitizedPost);
         }
       }
       localStorage.setItem(savedContentKey, JSON.stringify(savedContent));
@@ -123,7 +129,6 @@ export const useReport = (currentUserId: string) => {
     });
   }, [mutedKey]);
 
-  // Added isReported helper to check if an ID exists in reported posts or blocked users
   const isReported = useCallback((id: string) => reportState.reportedPostIds.includes(id) || reportState.reportedUserIds.includes(id), [reportState]);
   const isSaved = useCallback((id: string) => reportState.savedPostIds.includes(id), [reportState]);
   const isIgnored = useCallback((id: string) => reportState.notInterestedPostIds.includes(id), [reportState]);
