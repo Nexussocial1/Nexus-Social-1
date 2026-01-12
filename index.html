@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nexus Social</title>
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Firebase CDN -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -21,16 +21,16 @@
   <a href="groups.html">Groups</a>
 </nav>
 
-<main class="glass">
-  <h2>Login</h2>
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <button onclick="logout()">Logout</button>
-  <p id="status"></p>
-</main>
+<div class="post-box glass">
+  <h3 id="username">Ajia</h3>
+  <textarea id="postText" placeholder="What's happening?"></textarea>
+  <button onclick="createPost()">Post</button>
+</div>
+
+<div id="feed"></div>
 
 <script src="js/firebase.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>
